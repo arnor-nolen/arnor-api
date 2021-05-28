@@ -1,0 +1,34 @@
+{
+  "name": "arnor-api",
+  "version": "1.0.0",
+  "description": "API for arnor.dev",
+  "main": "index.js",
+  "scripts": {
+    "start": "nodemon -r esm .",
+    "prod": "node -r esm .",
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/arnor-nolen/arnor-api.git"
+  },
+  "keywords": [
+    "API"
+  ],
+  "author": "arnor-nolen",
+  "license": "MIT",
+  "bugs": {
+    "url": "https://github.com/arnor-nolen/arnor-api/issues"
+  },
+  "homepage": "https://github.com/arnor-nolen/arnor-api#readme",
+  "dependencies": {
+    "@apollo/client": "^3.3.19",
+    "apollo-server": "^2.25.0",
+    "dotenv": "^10.0.0",
+    "esm": "^3.2.25",
+    "graphql": "^15.5.0"
+  },
+  "devDependencies": {
+    "nodemon": "^2.0.7"
+  }
+}
