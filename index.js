@@ -101,10 +101,15 @@ const sendEmail = async (_, { name, email, message }) => {
     text: `This is an email from ${name} at ${email}.\n\n${message}`,
   };
 
-  const info = await transporter.sendMail(mailOptions);
+  transporter.sendMail(mailOptions, (error, info) => {
+    if (error) {
+      console.log(`Failed: ${error}`);
+    } else {
+      console.log(`Success: ${info.response}`);
+    }
+  });
 
-  console.log(`Success: ${info.response}`);
-  return { message: `Message sent: ${info.response}` };
+  return { message: `Message sent!` };
 };
 
 // Resolvers define the technique for fetching the types defined in the
