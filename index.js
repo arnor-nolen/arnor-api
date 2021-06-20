@@ -1,11 +1,18 @@
-import { PORT, EMAIL_ADDRESS, EMAIL_PASSWORD } from "./src/settings.js";
+import {
+  PORT,
+  EMAIL_ADDRESS,
+  EMAIL_PASSWORD,
+  SENDGRID_API_KEY,
+} from "./src/settings.js";
 import { ApolloServer, gql } from "apollo-server";
-import nodemailer from "nodemailer";
 import {
   typeDefs as typeDefsScalar,
   resolvers as resolversScalar,
 } from "graphql-scalars";
 import client from "./src/apolloClient";
+import sgMail from "@sendgrid/mail";
+
+sgMail.setApiKey(SENDGRID_API_KEY);
 
 // A schema is a collection of type definitions (hence "typeDefs")
 // that together define the "shape" of queries that are executed against
@@ -86,30 +93,22 @@ const githubInfo = async () => {
 
 const sendEmail = async (_, { name, email, message }) => {
   console.log(`Sending message: ${name} ${email} ${message}`);
-  const transporter = nodemailer.createTransport({
-    host: "smtp.gmail.com",
-    port: 465,
-    secure: true,
-    auth: {
-      user: EMAIL_ADDRESS,
-      pass: EMAIL_PASSWORD,
-    },
-  });
 
-  const mailOptions = {
+  const msg = {
     from: EMAIL_ADDRESS,
     to: EMAIL_ADDRESS,
     subject: "arnor.dev contact form",
     text: `This is an email from ${name} at ${email}.\n\n${message}`,
   };
 
-  transporter.sendMail(mailOptions, (error, info) => {
-    if (error) {
-      console.log(`Failed: ${error}`);
-    } else {
-      console.log(`Success: ${info.response}`);
-    }
-  });
+  sgMail
+    .send(msg)
+    .then((response) => {
+      console.log(`Success: status code ${response[0].statusCode}`);
+    })
+    .catch((error) => {
+      console.error(error);
+    });
 
   return { message: `Message sent!` };
 };

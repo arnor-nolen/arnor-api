@@ -1,6 +1,6 @@
 {
   "name": "arnor-api",
-  "version": "0.0.7",
+  "version": "0.0.8",
   "description": "API for arnor.dev",
   "main": "index.js",
   "scripts": {
@@ -23,12 +23,12 @@
   "homepage": "https://github.com/arnor-nolen/arnor-api#readme",
   "dependencies": {
     "@apollo/client": "^3.3.19",
+    "@sendgrid/mail": "^7.4.5",
     "apollo-server": "^2.25.0",
     "dotenv": "^10.0.0",
     "esm": "^3.2.25",
     "graphql": "^15.5.0",
-    "graphql-scalars": "^1.10.0",
-    "nodemailer": "^6.6.2"
+    "graphql-scalars": "^1.10.0"
   },
   "devDependencies": {
     "nodemon": "^2.0.7"
