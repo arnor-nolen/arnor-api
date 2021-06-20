@@ -1,23 +1,18 @@
-import { GITHUB_TOKEN, GITHUB_URL, PORT } from "./src/settings.js";
-import { ApolloClient, InMemoryCache, HttpLink } from "@apollo/client/core";
+import { PORT, EMAIL_ADDRESS, EMAIL_PASSWORD } from "./src/settings.js";
 import { ApolloServer, gql } from "apollo-server";
-import fetch from "node-fetch";
-
-const client = new ApolloClient({
-  link: new HttpLink({
-    uri: GITHUB_URL,
-    headers: {
-      Authorization: `Bearer ${GITHUB_TOKEN}`,
-    },
-    fetch,
-  }),
-  cache: new InMemoryCache(),
-});
+import nodemailer from "nodemailer";
+import {
+  typeDefs as typeDefsScalar,
+  resolvers as resolversScalar,
+} from "graphql-scalars";
+import client from "./src/apolloClient";
 
 // A schema is a collection of type definitions (hence "typeDefs")
 // that together define the "shape" of queries that are executed against
 // your data.
 const typeDefs = gql`
+  ${typeDefsScalar.join("\n")}
+
   type Language {
     name: String!
     color: String
@@ -40,10 +35,17 @@ const typeDefs = gql`
     company: String
     pinnedItems: Node!
   }
+  type Message {
+    message: String!
+  }
 
   type Query {
     ping: String!
     githubInfo: GithubInfo!
+  }
+
+  type Mutation {
+    sendEmail(name: String!, email: EmailAddress!, message: String!): Message!
   }
 `;
 
@@ -82,6 +84,31 @@ const githubInfo = async () => {
   });
 };
 
+const sendEmail = async (_, { name, email, message }) => {
+  const transporter = nodemailer.createTransport({
+    service: "gmail",
+    auth: {
+      user: EMAIL_ADDRESS,
+      pass: EMAIL_PASSWORD,
+    },
+  });
+
+  const mailOptions = {
+    from: EMAIL_ADDRESS,
+    to: EMAIL_ADDRESS,
+    subject: "arnor.dev contact form",
+    text: `This is an email from ${name} at ${email}.\n\n${message}`,
+  };
+
+  transporter.sendMail(mailOptions, (error, info) => {
+    if (error) {
+      return { message: "Failed sending the message!", error };
+    } else {
+      return { message: `Message sent: ${info.response}` };
+    }
+  });
+};
+
 // Resolvers define the technique for fetching the types defined in the
 // schema. This resolver retrieves books from the "books" array above.
 const resolvers = {
@@ -89,11 +116,18 @@ const resolvers = {
     ping: ping,
     githubInfo: githubInfo,
   },
+  Mutation: {
+    sendEmail: sendEmail,
+  },
 };
 
 // The ApolloServer constructor requires two parameters: your schema
 // definition and your set of resolvers.
-const server = new ApolloServer({ typeDefs, resolvers, introspection: true });
+const server = new ApolloServer({
+  typeDefs,
+  resolvers: { ...resolversScalar, ...resolvers },
+  introspection: true,
+});
 
 // The `listen` method launches a web server.
 server.listen({ port: PORT }).then(({ url }) => {
