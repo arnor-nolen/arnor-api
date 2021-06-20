@@ -123,6 +123,10 @@ const server = new ApolloServer({
   typeDefs,
   resolvers: { ...resolversScalar, ...resolvers },
   introspection: true,
+  cors: {
+    origin: "*",
+    credentials: true,
+  },
 });
 
 // The `listen` method launches a web server.
