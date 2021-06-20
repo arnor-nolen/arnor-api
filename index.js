@@ -85,6 +85,7 @@ const githubInfo = async () => {
 };
 
 const sendEmail = async (_, { name, email, message }) => {
+  console.log(`Sending message: ${name} ${email} ${message}`);
   const transporter = nodemailer.createTransport({
     service: "gmail",
     auth: {
@@ -102,6 +103,7 @@ const sendEmail = async (_, { name, email, message }) => {
 
   const info = await transporter.sendMail(mailOptions);
 
+  console.log(`Success: ${info.response}`);
   return { message: `Message sent: ${info.response}` };
 };
 
