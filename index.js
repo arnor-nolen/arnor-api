@@ -87,7 +87,9 @@ const githubInfo = async () => {
 const sendEmail = async (_, { name, email, message }) => {
   console.log(`Sending message: ${name} ${email} ${message}`);
   const transporter = nodemailer.createTransport({
-    service: "gmail",
+    host: "smtp.gmail.com",
+    port: 465,
+    secure: true,
     auth: {
       user: EMAIL_ADDRESS,
       pass: EMAIL_PASSWORD,
