@@ -24,6 +24,7 @@
   "dependencies": {
     "@apollo/client": "^3.3.19",
     "@sendgrid/mail": "^7.4.5",
+    "apollo-invalidation-policies": "^1.0.0-beta16",
     "apollo-server": "^2.25.0",
     "dotenv": "^10.0.0",
     "esm": "^3.2.25",
