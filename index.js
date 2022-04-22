@@ -1,8 +1,9 @@
 import {
   PORT,
   EMAIL_ADDRESS,
-  EMAIL_PASSWORD,
-  SENDGRID_API_KEY,
+  MAILGUN_API_KEY,
+  MAILGUN_DOMAIN,
+  MAILGUN_EMAIL,
 } from "./src/settings.js";
 import { ApolloServer, gql } from "apollo-server";
 import {
@@ -10,9 +11,8 @@ import {
   resolvers as resolversScalar,
 } from "graphql-scalars";
 import client from "./src/apolloClient";
-import sgMail from "@sendgrid/mail";
-
-sgMail.setApiKey(SENDGRID_API_KEY);
+const formData = require("form-data");
+const Mailgun = require("mailgun.js");
 
 // A schema is a collection of type definitions (hence "typeDefs")
 // that together define the "shape" of queries that are executed against
@@ -94,20 +94,26 @@ const githubInfo = async () => {
 const sendEmail = async (_, { name, email, message }) => {
   console.log(`Sending message: ${name} ${email} ${message}`);
 
-  const msg = {
-    from: EMAIL_ADDRESS,
+  const mailgun = new Mailgun(formData);
+  const mgClient = mailgun.client({
+    username: "api",
+    key: MAILGUN_API_KEY,
+  });
+
+  const messageData = {
+    from: MAILGUN_EMAIL,
     to: EMAIL_ADDRESS,
     subject: "arnor.dev contact form",
     text: `This is an email from ${name} at ${email}.\n\n${message}`,
   };
 
-  sgMail
-    .send(msg)
-    .then((response) => {
-      console.log(`Success: status code ${response[0].statusCode}`);
+  mgClient.messages
+    .create(MAILGUN_DOMAIN, messageData)
+    .then((res) => {
+      console.log(res);
     })
-    .catch((error) => {
-      console.error(error);
+    .catch((err) => {
+      console.error(err);
     });
 
   return { message: `Message sent!` };
